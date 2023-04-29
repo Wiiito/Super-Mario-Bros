@@ -32,4 +32,5 @@ class Engine {
 
   // get functions
   bool getIsWindowOpen();
+  float getElapsedTime();
 };

@@ -2,6 +2,8 @@
 
 #include <iostream>
 
+#include "../include/globals.hpp"
+
 // ---- Start Private ----
 
 // Init
@@ -42,6 +44,7 @@ void Engine::poolEvents() {
         if (this->ev.key.code == Keyboard::Escape) {
           window->close();
         }
+        break;
     }
   }
 }
@@ -67,6 +70,9 @@ void Engine::update() {
   */
 
   poolEvents();
+
+  mario.update();
+  elapsedTime.restart();
 }
 
 void Engine::render() {
