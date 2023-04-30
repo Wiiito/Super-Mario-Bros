@@ -12,6 +12,8 @@ class Engine {
   VideoMode resolution;
   Event ev;
 
+  Texture *gameTexture;
+
   Mario mario;
 
   // Init game variables

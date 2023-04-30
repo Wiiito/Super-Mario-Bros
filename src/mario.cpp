@@ -19,6 +19,8 @@ Mario::Mario() {
   this->position = Vector2f(0.f, 0.f);
   this->hitbox.setFillColor(Color(255, 127, 127));
   this->hitbox.setSize(Vector2f(float(HOUSE_SIZE) * 3, float(HOUSE_SIZE) * 3));
+
+  this->jumping = false;
 }
 
 Mario::~Mario() {}
@@ -30,6 +32,8 @@ void Mario::move() {
     @reutrn void
     Handle mario controls
     - if A or D pressed, add acceleartion to velocity, else, remove it from velocity
+
+    - Applies gravity
   */
 
   if (Keyboard::isKeyPressed(Keyboard::A)) {
@@ -52,9 +56,21 @@ void Mario::move() {
           std::max(0.f, velocity.x - acceleration.x * elapsedTime.getElapsedTime().asSeconds());
     }
     if (velocity.x < 0) {
-      velocity.x = std::min(float(HOUSE_SIZE * 2),
+      velocity.x = std::min(float(HOUSE_SIZE),
                             velocity.x + acceleration.x * elapsedTime.getElapsedTime().asSeconds());
     }
+  }
+
+  // Appling gravity
+  if (!this->jumping && !map.doesColide(this->position)) {
+    this->velocity.y = std::min(
+        float(HOUSE_SIZE), velocity.y + HOUSE_SIZE / 4 * elapsedTime.getElapsedTime().asSeconds());
+  }
+
+  // Checando se está no chão
+  if (map.doesColide(this->position)) {
+    this->velocity.y = 0;
+    this->position.y = int(position.y / (HOUSE_SIZE * 3)) * HOUSE_SIZE * 3;
   }
 }
 
@@ -72,6 +88,10 @@ void Mario::update() {
   this->hitbox.setPosition(this->position);
 }
 
-void Mario::render(RenderWindow *window) { window->draw(this->hitbox); }
+void Mario::render(RenderWindow *window, Texture *gameTexture) {
+  this->map.render(window, gameTexture);
+
+  window->draw(this->hitbox);
+}
 
 // ---- End Public ----

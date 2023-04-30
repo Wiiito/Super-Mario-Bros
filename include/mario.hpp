@@ -2,6 +2,8 @@
 
 #include <SFML/Graphics.hpp>
 
+#include "map.hpp"
+
 using namespace sf;
 
 class Mario {
@@ -9,8 +11,12 @@ class Mario {
   Vector2f position;
   RectangleShape hitbox;
 
+  Map map;
+
   Vector2f velocity;
   Vector2f acceleration;
+
+  bool jumping;
 
  public:
   Mario();
@@ -18,5 +24,5 @@ class Mario {
 
   void move();
   void update();
-  void render(RenderWindow *window);
+  void render(RenderWindow *window, Texture *gameTexture);
 };
