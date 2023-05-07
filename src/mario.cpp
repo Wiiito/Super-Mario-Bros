@@ -7,6 +7,7 @@ using namespace sf;
 
 extern int HOUSE_SIZE;
 extern Clock elapsedTime;
+extern Texture *gameTexture;
 
 // ---- Start Public ----
 
@@ -14,12 +15,15 @@ extern Clock elapsedTime;
 
 Mario::Mario() {
   this->velocity = Vector2f(0.f, 0.f);
-  this->acceleration = Vector2f(1.f, 1.f);
+  this->acceleration = Vector2f(0.1f, 0.1f);
 
   this->position = Vector2f(0.f, 0.f);
-  this->hitbox.setFillColor(Color(255, 127, 127));
   this->hitbox.setSize(Vector2f(float(HOUSE_SIZE) * 3, float(HOUSE_SIZE) * 3));
+  this->hitbox.setTexture(gameTexture);
+  this->hitbox.setTextureRect(IntRect(0, HOUSE_SIZE, HOUSE_SIZE, HOUSE_SIZE));
+  // this->hitbox.setFillColor(Color(255, 127, 127));
 
+  this->facingRight = true;
   this->jumping = false;
 }
 
@@ -31,46 +35,60 @@ void Mario::move() {
   /*
     @reutrn void
     Handle mario controls
-    - if A or D pressed, add acceleartion to velocity, else, remove it from velocity
+    - if A or D pressed, add acceleartion to velocity
+      -If moving on another directin, stops faster
+      -If none key is pressed, stops player
+      - Sets facingRight variable
 
     - Applies gravity
+    - Checks if on ground
   */
 
   if (Keyboard::isKeyPressed(Keyboard::A)) {
-    if (velocity.x < 0) {
-      velocity.x -= acceleration.x * elapsedTime.getElapsedTime().asSeconds();
+    if (this->velocity.x < 0) {
+      this->velocity.x -= this->acceleration.x * elapsedTime.getElapsedTime().asSeconds();
     } else {
-      velocity.x -= acceleration.x * 2 * elapsedTime.getElapsedTime().asSeconds();
+      this->velocity.x -= this->acceleration.x * 2 * elapsedTime.getElapsedTime().asSeconds();
     }
+
+    // Setting face right var
+    this->facingRight = false;
   }
+
   if (Keyboard::isKeyPressed(Keyboard::D)) {
-    if (velocity.x > 0) {
-      velocity.x += acceleration.x * elapsedTime.getElapsedTime().asSeconds();
+    if (this->velocity.x > 0) {
+      this->velocity.x += this->acceleration.x * elapsedTime.getElapsedTime().asSeconds();
     } else {
-      velocity.x += acceleration.x * 2 * elapsedTime.getElapsedTime().asSeconds();
+      this->velocity.x += this->acceleration.x * 2 * elapsedTime.getElapsedTime().asSeconds();
     }
+
+    // Setting face right var
+    this->facingRight = true;
   }
+
   if (!Keyboard::isKeyPressed(Keyboard::A) && !Keyboard::isKeyPressed(Keyboard::D)) {
-    if (velocity.x > 0) {
-      velocity.x =
-          std::max(0.f, velocity.x - acceleration.x * elapsedTime.getElapsedTime().asSeconds());
+    if (this->velocity.x > 0) {
+      this->velocity.x = std::max(
+          0.f, this->velocity.x - this->acceleration.x * elapsedTime.getElapsedTime().asSeconds());
     }
-    if (velocity.x < 0) {
-      velocity.x = std::min(float(HOUSE_SIZE),
-                            velocity.x + acceleration.x * elapsedTime.getElapsedTime().asSeconds());
+
+    if (this->velocity.x < 0) {
+      this->velocity.x =
+          std::min(float(1), this->velocity.x +
+                                 this->acceleration.x * elapsedTime.getElapsedTime().asSeconds());
     }
   }
 
   // Appling gravity
   if (!this->jumping && !map.doesColide(this->position)) {
     this->velocity.y = std::min(
-        float(HOUSE_SIZE), velocity.y + HOUSE_SIZE / 4 * elapsedTime.getElapsedTime().asSeconds());
+        float(0.2), velocity.y + HOUSE_SIZE / 4 * elapsedTime.getElapsedTime().asSeconds());
   }
 
-  // Checando se está no chão
+  // Ground check
   if (map.doesColide(this->position)) {
     this->velocity.y = 0;
-    this->position.y = int(position.y / (HOUSE_SIZE * 3)) * HOUSE_SIZE * 3;
+    this->position.y = int(this->position.y / (HOUSE_SIZE * 3)) * HOUSE_SIZE * 3;
   }
 }
 
@@ -88,8 +106,21 @@ void Mario::update() {
   this->hitbox.setPosition(this->position);
 }
 
-void Mario::render(RenderWindow *window, Texture *gameTexture) {
-  this->map.render(window, gameTexture);
+void Mario::render(RenderWindow *window) {
+  /*
+    @return void
+    Handles mario rendering
+    - Change facing direction
+    - Change animation
+    - Renders map
+    - Renders on screen
+  */
+
+  this->map.render(window);
+
+  // Reads the texture from behind if facingRight is false
+  hitbox.setTextureRect(IntRect(!this->facingRight * HOUSE_SIZE, HOUSE_SIZE,
+                                (2 * this->facingRight - 1) * HOUSE_SIZE, HOUSE_SIZE));
 
   window->draw(this->hitbox);
 }

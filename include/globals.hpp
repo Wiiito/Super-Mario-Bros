@@ -4,3 +4,5 @@
 int HOUSE_SIZE = 16;
 
 sf::Clock elapsedTime;
+
+Texture *gameTexture;

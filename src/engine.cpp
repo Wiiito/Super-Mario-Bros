@@ -15,7 +15,13 @@ void Engine::initVariables() {
    */
 
   this->window = nullptr;
-  this->gameTexture = nullptr;
+
+  gameTexture = nullptr;
+  gameTexture = new Texture;
+  gameTexture->loadFromFile("assets/texture.png");
+
+  this->mario = nullptr;
+  this->mario = new Mario;
 }
 
 void Engine::initWindow() {
@@ -28,9 +34,6 @@ void Engine::initWindow() {
   this->resolution.width = 256 * 3;
   this->resolution.height = 224 * 3;
   this->window = new RenderWindow(resolution, "Super Mario Bros", Style::Titlebar);
-
-  this->gameTexture = new Texture;
-  this->gameTexture->loadFromFile("assets/texture.png");
 }
 
 void Engine::poolEvents() {
@@ -75,7 +78,7 @@ void Engine::update() {
 
   poolEvents();
 
-  this->mario.update();
+  this->mario->update();
   elapsedTime.restart();
 }
 
@@ -87,7 +90,7 @@ void Engine::render() {
 
   this->window->clear();
 
-  this->mario.render(this->window, this->gameTexture);
+  this->mario->render(this->window);
 
   this->window->display();
 }

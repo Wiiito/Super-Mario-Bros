@@ -19,5 +19,5 @@ class Map {
   // Functions
   bool doesColide(Vector2f pos);
 
-  void render(RenderWindow *window, Texture *texture);
+  void render(RenderWindow *window);
 };
