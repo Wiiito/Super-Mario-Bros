@@ -35,7 +35,7 @@ void Map::render(RenderWindow *window) {
   block.setSize(Vector2f(HOUSE_SIZE * 3, HOUSE_SIZE * 3));
   for (int x = 0; x < map.size(); x++) {
     for (int y = 0; y < map[x].size(); y++) {
-      block.setTextureRect(IntRect(map[x][y] * HOUSE_SIZE, 0, HOUSE_SIZE, HOUSE_SIZE));
+      block.setTextureRect(IntRect(map[x][y] * HOUSE_SIZE, HOUSE_SIZE * 2, HOUSE_SIZE, HOUSE_SIZE));
       block.setPosition(x * HOUSE_SIZE * 3, y * HOUSE_SIZE * 3);
       window->draw(block);
     }

@@ -1,7 +1,9 @@
 #pragma once
 
 #include <SFML/Graphics.hpp>
+#include <vector>
 
+#include "animations.hpp"
 #include "map.hpp"
 
 using namespace sf;
@@ -16,8 +18,11 @@ class Mario {
   Vector2f velocity;
   Vector2f acceleration;
 
+  std::vector<Animation> animations;
+  Animation *currentAnimation;
+
   bool facingRight;
-  bool jumping;
+  bool isJumping;
 
  public:
   Mario();

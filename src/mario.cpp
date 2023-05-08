@@ -24,7 +24,13 @@ Mario::Mario() {
   // this->hitbox.setFillColor(Color(255, 127, 127));
 
   this->facingRight = true;
-  this->jumping = false;
+  this->isJumping = false;
+
+  this->animations.push_back(Animation(idle, 1, 0.f, Vector2i(0, 0)));
+  this->animations.push_back(Animation(moving, 3, 0.12f, Vector2i(0, 1)));
+  this->animations.push_back(Animation(jumping, 3, 0.f, Vector2i(0, 2)));
+
+  this->currentAnimation = &animations[idle];
 }
 
 Mario::~Mario() {}
@@ -80,7 +86,7 @@ void Mario::move() {
   }
 
   // Appling gravity
-  if (!this->jumping && !map.doesColide(this->position)) {
+  if (!this->isJumping && !map.doesColide(this->position)) {
     this->velocity.y = std::min(
         float(0.2), velocity.y + HOUSE_SIZE / 4 * elapsedTime.getElapsedTime().asSeconds());
   }
@@ -89,6 +95,13 @@ void Mario::move() {
   if (map.doesColide(this->position)) {
     this->velocity.y = 0;
     this->position.y = int(this->position.y / (HOUSE_SIZE * 3)) * HOUSE_SIZE * 3;
+  }
+
+  // Setting animation
+  currentAnimation = &animations[idle];
+
+  if (velocity.x != 0) {
+    currentAnimation = &animations[moving];
   }
 }
 
@@ -119,8 +132,10 @@ void Mario::render(RenderWindow *window) {
   this->map.render(window);
 
   // Reads the texture from behind if facingRight is false
-  hitbox.setTextureRect(IntRect(!this->facingRight * HOUSE_SIZE, HOUSE_SIZE,
-                                (2 * this->facingRight - 1) * HOUSE_SIZE, HOUSE_SIZE));
+  hitbox.setTextureRect(
+      IntRect(currentAnimation->getFramePosition().x * HOUSE_SIZE + HOUSE_SIZE * !this->facingRight,
+              currentAnimation->getFramePosition().y * HOUSE_SIZE,
+              HOUSE_SIZE * (2 * this->facingRight - 1), HOUSE_SIZE));
 
   window->draw(this->hitbox);
 }
